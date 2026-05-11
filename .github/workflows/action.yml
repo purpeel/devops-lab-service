@@ -1,0 +1,27 @@
+name: lab5-action
+
+on: 
+  push:
+    branches: master
+
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v4
+
+      - name: container build
+        run: docker build -f docker/Dockerfile -t lab4 .
+      
+      - name: container test run
+        run: |
+          docker run -d --name lab4 -p 5000:5000 lab4:latest
+          sleep 5
+          curl --fail http://localhost:5000 || exit 1
+          docker stop lab4
+      
+      - name: cleanup
+        if: always()
+        run: docker rm -f lab4
